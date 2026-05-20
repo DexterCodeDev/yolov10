@@ -1,7 +1,6 @@
 import gradio as gr
 import cv2
 import tempfile
-import os
 from ultralytics import YOLOv10
 
 
@@ -158,8 +157,5 @@ with gradio_app:
     with gr.Row():
         with gr.Column():
             app()
-
 if __name__ == '__main__':
-    # Binds directly to Cloud Run's environment port
-    port = int(os.environ.get("PORT", 8080))
-    gradio_app.launch(server_name="0.0.0.0", server_port=port)
+    gradio_app.launch()
