@@ -1,8 +1,9 @@
 import gradio as gr
 import cv2
 import tempfile
+import os  # Imported to read the Cloud Run port
+from utils import YOLOv10 # Ensure local module imports work seamlessly depending on fork layout
 from ultralytics import YOLOv10
-
 
 def yolov10_inference(image, video, model_id, image_size, conf_threshold):
     model = YOLOv10.from_pretrained(f'jameslahm/{model_id}')
@@ -157,5 +158,9 @@ with gradio_app:
     with gr.Row():
         with gr.Column():
             app()
+
 if __name__ == '__main__':
-    gradio_app.launch()
+    # Cloud Run injects the routing port dynamically into environmental variables
+    port = int(os.environ.get("PORT", 7860))
+    # server_name="0.0.0.0" allows external HTTP proxies to reach the app container
+    gradio_app.launch(server_name="0.0.0.0", server_port=port)
