@@ -1,8 +1,7 @@
 import gradio as gr
 import cv2
 import tempfile
-import os  # Imported to read the Cloud Run port
-from utils import YOLOv10 # Ensure local module imports work seamlessly depending on fork layout
+import os  
 from ultralytics import YOLOv10
 
 def yolov10_inference(image, video, model_id, image_size, conf_threshold):
@@ -19,6 +18,10 @@ def yolov10_inference(image, video, model_id, image_size, conf_threshold):
 
         cap = cv2.VideoCapture(video_path)
         fps = cap.get(cv2.CAP_PROP_FPS)
+        frame_width = int(cap.get(cap.get(cv2.CAP_PROP_FRAME_WIDTH))) if cap.get(cv2.CAP_PROP_FRAME_WIDTH) else 640
+        frame_height = int(cap.get(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))) if cap.get(cv2.CAP_PROP_FRAME_HEIGHT) else 480
+
+        # Fixed a fallback width/height logic step for safety
         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
@@ -160,7 +163,6 @@ with gradio_app:
             app()
 
 if __name__ == '__main__':
-    # Cloud Run injects the routing port dynamically into environmental variables
+    # Dynamic port detection injected via Google Cloud infrastructure routing
     port = int(os.environ.get("PORT", 7860))
-    # server_name="0.0.0.0" allows external HTTP proxies to reach the app container
     gradio_app.launch(server_name="0.0.0.0", server_port=port)
